@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/i18n">
+        <file alias="pluginHome_en_US.qm">i18n/pluginHome_en_US.qm</file>
+        <file alias="pluginHome_fr_FR.qm">i18n/pluginHome_fr_FR.qm</file>
+    </qresource>
+    <qresource prefix="/theme">
+        <file alias="pluginHome.qss">theme/theme.qss</file>
+    </qresource>
+</RCC>
