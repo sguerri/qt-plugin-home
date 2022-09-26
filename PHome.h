@@ -12,7 +12,7 @@ public:
     PHome();
     ~PHome() {}
 
-    static void LoadTranslation(QApplication* app, QLocale locale);
+    static QTranslator* Translator();
     static QString Theme();
 };
 

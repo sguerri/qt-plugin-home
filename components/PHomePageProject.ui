@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>HomePageFile</class>
- <widget class="QWidget" name="HomePageFile">
+ <class>PHomePageProject</class>
+ <widget class="QWidget" name="PHomePageProject">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>350</width>
+    <width>357</width>
     <height>153</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string notr="true">Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -50,7 +50,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <property name="spacing">
-         <number>3</number>
+         <number>6</number>
         </property>
         <property name="rightMargin">
          <number>0</number>
@@ -88,7 +88,7 @@
               <string notr="true"/>
              </property>
              <property name="text">
-              <string>TITLE</string>
+              <string notr="true">TITLE</string>
              </property>
              <property name="margin">
               <number>0</number>
@@ -99,7 +99,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="lblPath">
+            <widget class="QLabel" name="lblCode">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -107,7 +107,7 @@
               </font>
              </property>
              <property name="text">
-              <string>path</string>
+              <string notr="true">code</string>
              </property>
              <property name="margin">
               <number>0</number>
@@ -126,7 +126,7 @@
            <cursorShape>PointingHandCursor</cursorShape>
           </property>
           <property name="text">
-           <string>E</string>
+           <string/>
           </property>
           <property name="icon">
            <iconset>
@@ -146,29 +146,17 @@
            <cursorShape>PointingHandCursor</cursorShape>
           </property>
           <property name="focusPolicy">
-           <enum>Qt::NoFocus</enum>
+           <enum>Qt::TabFocus</enum>
           </property>
           <property name="text">
-           <string>R</string>
+           <string/>
           </property>
           <property name="icon">
            <iconset>
             <normaloff>:/icons/delete</normaloff>:/icons/delete</iconset>
           </property>
-          <property name="iconSize">
-           <size>
-            <width>16</width>
-            <height>16</height>
-           </size>
-          </property>
-          <property name="shortcut">
-           <string>Ctrl+S</string>
-          </property>
-          <property name="checkable">
-           <bool>false</bool>
-          </property>
-          <property name="autoRaise">
-           <bool>false</bool>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonIconOnly</enum>
           </property>
          </widget>
         </item>
@@ -202,19 +190,25 @@
            </font>
           </property>
           <property name="text">
-           <string>Title</string>
+           <string>Code</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="txtTitle">
+         <widget class="QLineEdit" name="txtCode">
           <property name="font">
            <font>
             <pointsize>10</pointsize>
            </font>
           </property>
+          <property name="inputMask">
+           <string/>
+          </property>
           <property name="placeholderText">
-           <string>Title</string>
+           <string>Code</string>
+          </property>
+          <property name="clearButtonEnabled">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -239,22 +233,19 @@
            </font>
           </property>
           <property name="text">
-           <string>Path</string>
+           <string>Title</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="txtPath">
+         <widget class="QLineEdit" name="txtTitle">
           <property name="font">
            <font>
             <pointsize>10</pointsize>
            </font>
           </property>
-          <property name="inputMask">
-           <string/>
-          </property>
           <property name="placeholderText">
-           <string>Path</string>
+           <string>Title</string>
           </property>
          </widget>
         </item>
@@ -274,10 +265,10 @@
            <cursorShape>PointingHandCursor</cursorShape>
           </property>
           <property name="focusPolicy">
-           <enum>Qt::NoFocus</enum>
+           <enum>Qt::TabFocus</enum>
           </property>
           <property name="text">
-           <string>C</string>
+           <string/>
           </property>
           <property name="icon">
            <iconset>
@@ -299,12 +290,12 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="btUpdate">
+         <widget class="QPushButton" name="btCreate">
           <property name="cursor">
            <cursorShape>PointingHandCursor</cursorShape>
           </property>
           <property name="text">
-           <string>Save changes</string>
+           <string>Create the project</string>
           </property>
           <property name="autoDefault">
            <bool>true</bool>
@@ -324,6 +315,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>btCreate</tabstop>
+  <tabstop>btCancel</tabstop>
+  <tabstop>btEdit</tabstop>
+  <tabstop>btDelete</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -1,2 +1,5 @@
+- [ ] File type extension other than json
+- [ ] Partie gauche : Session / Project (saved in settings)
+- [ ] Partie droite : Folder / File (disk location)
 - [ ] Readme
 - [ ] Code documentation

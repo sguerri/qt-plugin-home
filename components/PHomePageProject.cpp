@@ -1,28 +1,19 @@
-#include "HomePageProject.h"
-#include "ui_HomePageProject.h"
+#include "PHomePageProject.h"
+#include "ui_PHomePageProject.h"
 
 #include <QStyle>
 #include <QSettings>
 #include <QMouseEvent>
 #include <QMessageBox>
 
-#include "utils/Theme.h"
-#include "HomePageSlugify.h"
+#include "utils/slugify.h"
 
-using namespace HomePage;
-
-/*
-
-#include <QRegularExpression>
-#include <QMouseEvent>
-*/
-
-Project::Project(const QString& code, const QString& title) :
+PHomePageProject::PHomePageProject(const QString& code, const QString& title) :
     m_code(code)
   , m_title(title)
 {}
 
-QJsonObject Project::toJson() const
+QJsonObject PHomePageProject::toJson() const
 {
     QJsonObject obj;
     obj["code"] = this->m_code;
@@ -30,12 +21,12 @@ QJsonObject Project::toJson() const
     return obj;
 }
 
-Project* Project::fromJson(const QJsonObject& obj)
+PHomePageProject* PHomePageProject::fromJson(const QJsonObject& obj)
 {
     const QString& code = obj.value("code").toString();
     const QString& title = obj.value("title").toString();
 
-    return new Project(code, title);
+    return new PHomePageProject(code, title);
 }
 
 
@@ -48,7 +39,7 @@ Project* Project::fromJson(const QJsonObject& obj)
 
 // EVENT FILTER //////////////////////////////////////////////////////////
 
-bool ProjectWidgetEventFilter::eventFilter(QObject* obj, QEvent* event)
+bool PHomePageProjectWidgetEventFilter::eventFilter(QObject* obj, QEvent* event)
 {
     if (event->type() == QEvent::MouseButtonPress)
     {
@@ -64,9 +55,9 @@ bool ProjectWidgetEventFilter::eventFilter(QObject* obj, QEvent* event)
 
 // CONSTRUCTOR ///////////////////////////////////////////////////////////
 
-ProjectWidget::ProjectWidget(QWidget *parent) :
+PHomePageProjectWidget::PHomePageProjectWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::HomePageProject)
+    ui(new Ui::PHomePageProject)
 {
     ui->setupUi(this);
 
@@ -79,14 +70,14 @@ ProjectWidget::ProjectWidget(QWidget *parent) :
     ui->btEdit->setIcon(iconEdit);
     ui->btDelete->setIcon(iconDelete);
 
-    connect(ui->txtCode, &QLineEdit::textChanged, this, &ProjectWidget::onCodeChanged);
-    connect(ui->btCancel, &QToolButton::clicked, this, &ProjectWidget::onCancel);
-    connect(ui->btCreate, &QPushButton::clicked, this, &ProjectWidget::onSave);
-    connect(ui->btDelete, &QToolButton::clicked, this, &ProjectWidget::onDelete);
-    connect(ui->btEdit, &QToolButton::clicked, this, &ProjectWidget::onEdit);
+    connect(ui->txtCode, &QLineEdit::textChanged, this, &PHomePageProjectWidget::onCodeChanged);
+    connect(ui->btCancel, &QToolButton::clicked, this, &PHomePageProjectWidget::onCancel);
+    connect(ui->btCreate, &QPushButton::clicked, this, &PHomePageProjectWidget::onSave);
+    connect(ui->btDelete, &QToolButton::clicked, this, &PHomePageProjectWidget::onDelete);
+    connect(ui->btEdit, &QToolButton::clicked, this, &PHomePageProjectWidget::onEdit);
 
-    ProjectWidgetEventFilter* eventFilter = new ProjectWidgetEventFilter(ui->show);
-    connect(eventFilter, &ProjectWidgetEventFilter::clicked, this, &ProjectWidget::select);
+    PHomePageProjectWidgetEventFilter* eventFilter = new PHomePageProjectWidgetEventFilter(ui->show);
+    connect(eventFilter, &PHomePageProjectWidgetEventFilter::clicked, this, &PHomePageProjectWidget::select);
     ui->show->installEventFilter(eventFilter);
 
     this->m_project = nullptr;
@@ -95,7 +86,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) :
     this->uiUpdate();
 }
 
-ProjectWidget::~ProjectWidget()
+PHomePageProjectWidget::~PHomePageProjectWidget()
 {
     delete ui;
 }
@@ -103,7 +94,7 @@ ProjectWidget::~ProjectWidget()
 
 // UI ////////////////////////////////////////////////////////////////////
 
-void ProjectWidget::uiUpdate()
+void PHomePageProjectWidget::uiUpdate()
 {
     if (this->hasProject()) {
         ui->lblCode->setText(this->m_project->code());
@@ -129,7 +120,7 @@ void ProjectWidget::uiUpdate()
 
 // SLOTS /////////////////////////////////////////////////////////////////
 
-void ProjectWidget::onCancel()
+void PHomePageProjectWidget::onCancel()
 {
     if (this->m_isCreating) {
         this->close();
@@ -140,7 +131,7 @@ void ProjectWidget::onCancel()
     }
 }
 
-void ProjectWidget::onSave()
+void PHomePageProjectWidget::onSave()
 {
     if (this->m_isCreating)
     {
@@ -151,14 +142,14 @@ void ProjectWidget::onSave()
         QString title = ui->txtTitle->text().trimmed();
 
         QSettings settings;
-        if (settings.contains("homepage/project/" + code)) return; // TODO add notification
+        if (settings.contains("application/homepage/project/" + code)) return; // TODO add notification
 
-        this->m_project = new Project(code, title);
+        this->m_project = new PHomePageProject(code, title);
         this->m_isCreating = false;
         this->m_isEditing = false;
         this->uiUpdate();
 
-        settings.setValue("homepage/project/" + code, this->m_project->toJson());
+        settings.setValue("application/homepage/project/" + code, this->m_project->toJson());
 
         emit this->created(this->m_project);
     }
@@ -174,17 +165,17 @@ void ProjectWidget::onSave()
         this->uiUpdate();
 
         QSettings settings;
-        settings.setValue("homepage/project/" + this->m_project->code(), this->m_project->toJson());
+        settings.setValue("application/homepage/project/" + this->m_project->code(), this->m_project->toJson());
 
         emit this->updated(this->m_project);
     }
 }
 
-void ProjectWidget::onDelete()
+void PHomePageProjectWidget::onDelete()
 {
     if (QMessageBox::question(this, qApp->applicationName(), tr("Delete project?")) == QMessageBox::Yes) {
         QSettings settings;
-        settings.remove("homepage/project/" + this->m_project->code());
+        settings.remove("application/homepage/project/" + this->m_project->code());
 
         emit this->deleted(this->m_project);
 
@@ -193,31 +184,38 @@ void ProjectWidget::onDelete()
     }
 }
 
-void ProjectWidget::onEdit()
+void PHomePageProjectWidget::onEdit()
 {
     this->m_isEditing = true;
     this->m_isCreating = false;
     this->uiUpdate();
 }
 
-void ProjectWidget::onCodeChanged(const QString& text)
+void PHomePageProjectWidget::onCodeChanged(const QString& text)
 {
     int pos = ui->txtCode->cursorPosition();
-    ui->txtCode->setText(HomePage::slugify(text));
+    ui->txtCode->setText(pluginHome::utils::slugify(text));
     ui->txtCode->setCursorPosition(pos);
 }
 
 
 // ACTIONS ///////////////////////////////////////////////////////////////
 
-void ProjectWidget::select()
+void PHomePageProjectWidget::select()
 {
-    ui->show->setStyleSheet("background-color: " + Theme::getColor("@homepageprojetselected"));
+    // TODO replace
+    //ui->show->setStyleSheet("background-color: " + Theme::getColor("@homepageprojetselected"));
+    ui->show->setStyleSheet("background-color: #EFEFEF");
+    //@homepageprojetselected = #EFEFEF
+    //@homepageprojetunselected = #FAFAFA
+    //ui->show.sets
     emit this->selected(this->m_project);
 }
 
-void ProjectWidget::unselect()
+void PHomePageProjectWidget::unselect()
 {
-    ui->show->setStyleSheet("background-color: " + Theme::getColor("@homepageprojetunselected"));
+    // TODO replace
+    //ui->show->setStyleSheet("background-color: " + Theme::getColor("@homepageprojetunselected"));
+    ui->show->setStyleSheet("background-color: #FAFAFA");
 }
 

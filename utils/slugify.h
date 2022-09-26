@@ -1,5 +1,5 @@
-#ifndef HOMEPAGE_SLUGIFY_H
-#define HOMEPAGE_SLUGIFY_H
+#ifndef PHOME_UTILS_SLUGIFY_H
+#define PHOME_UTILS_SLUGIFY_H
 
 #include <string>
 #include <unordered_map>
@@ -8,7 +8,7 @@
 
 #include <QString>
 
-namespace HomePage
+namespace pluginHome::utils
 {
     QString slugify(const QString& text)
     {
@@ -110,4 +110,4 @@ namespace HomePage
 
 
 
-#endif // HOMEPAGE_SLUGIFY_H
+#endif // PHOME_UTILS_SLUGIFY_H

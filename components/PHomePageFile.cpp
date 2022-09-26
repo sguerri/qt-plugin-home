@@ -1,19 +1,17 @@
-#include "HomePageFile.h"
-#include "ui_HomePageFile.h"
+#include "PHomePageFile.h"
+#include "ui_PHomePageFile.h"
 
 #include <QStyle>
 #include <QMessageBox>
 
-using namespace HomePage;
-
-File::File(const QString& id, Project* project, const QString& title, const QString& path) :
+PHomePageFile::PHomePageFile(const QString& id, PHomePageProject* project, const QString& title, const QString& path) :
     m_id(id)
   , m_project(project)
   , m_title(title)
   , m_path(path)
 {}
 
-QJsonObject File::toJson() const
+QJsonObject PHomePageFile::toJson() const
 {
     QJsonObject obj;
     obj["id"] = this->m_id;
@@ -35,7 +33,7 @@ File* File::fromJson(Project* project, const QJsonObject& obj)
 
 // EVENT FILTER //////////////////////////////////////////////////////////
 
-bool FileWidgetEventFilter::eventFilter(QObject* obj, QEvent* event)
+bool PHomePageFileWidgetEventFilter::eventFilter(QObject* obj, QEvent* event)
 {
     if (event->type() == QEvent::MouseButtonDblClick)
     {
@@ -48,9 +46,9 @@ bool FileWidgetEventFilter::eventFilter(QObject* obj, QEvent* event)
 
 // CONSTRUCTOR ///////////////////////////////////////////////////////////
 
-FileWidget::FileWidget(QWidget *parent) :
+PHomePageFileWidget::PHomePageFileWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::HomePageFile)
+    ui(new Ui::PHomePageFile)
 {
     ui->setupUi(this);
 
@@ -63,13 +61,13 @@ FileWidget::FileWidget(QWidget *parent) :
     ui->btEdit->setIcon(iconEdit);
     ui->btDelete->setIcon(iconDelete);
 
-    connect(ui->btDelete, &QToolButton::clicked, this, &FileWidget::onDelete);
-    connect(ui->btEdit, &QToolButton::clicked, this, &FileWidget::onEdit);
-    connect(ui->btCancel, &QToolButton::clicked, this, &FileWidget::onCancel);
-    connect(ui->btUpdate, &QPushButton::clicked, this, &FileWidget::onUpdate);
+    connect(ui->btDelete, &QToolButton::clicked, this, &PHomePageFileWidget::onDelete);
+    connect(ui->btEdit, &QToolButton::clicked, this, &PHomePageFileWidget::onEdit);
+    connect(ui->btCancel, &QToolButton::clicked, this, &PHomePageFileWidget::onCancel);
+    connect(ui->btUpdate, &QPushButton::clicked, this, &PHomePageFileWidget::onUpdate);
 
-    FileWidgetEventFilter* eventFilter = new FileWidgetEventFilter(ui->show);
-    connect(eventFilter, &FileWidgetEventFilter::doubleclicked, this, [=](){
+    PHomePageFileWidgetEventFilter* eventFilter = new PHomePageFileWidgetEventFilter(ui->show);
+    connect(eventFilter, &PHomePageFileWidgetEventFilter::doubleclicked, this, [=](){
         emit this->doubleclicked(this->m_file);
     });
     ui->show->installEventFilter(eventFilter);
@@ -79,7 +77,7 @@ FileWidget::FileWidget(QWidget *parent) :
     this->uiUpdate();
 }
 
-FileWidget::~FileWidget()
+PHomePageFileWidget::~PHomePageFileWidget()
 {
     delete ui;
 }
@@ -87,7 +85,7 @@ FileWidget::~FileWidget()
 
 // UI ////////////////////////////////////////////////////////////////////
 
-void FileWidget::uiUpdate()
+void PHomePageFileWidget::uiUpdate()
 {
     if (this->hasFile()) {
         ui->lblTitle->setText(this->m_file->title());
@@ -107,7 +105,7 @@ void FileWidget::uiUpdate()
     if (this->m_isEditing) ui->txtTitle->setFocus();
 }
 
-void FileWidget::onDelete()
+void PHomePageFileWidget::onDelete()
 {
     if (QMessageBox::question(this, qApp->applicationName(), tr("Delete file?")) == QMessageBox::Yes) {
         emit this->deleted(this->m_file);
@@ -116,19 +114,19 @@ void FileWidget::onDelete()
     }
 }
 
-void FileWidget::onEdit()
+void PHomePageFileWidget::onEdit()
 {
     this->m_isEditing = true;
     this->uiUpdate();
 }
 
-void FileWidget::onCancel()
+void PHomePageFileWidget::onCancel()
 {
     this->m_isEditing = false;
     this->uiUpdate();
 }
 
-void FileWidget::onUpdate()
+void PHomePageFileWidget::onUpdate()
 {
     if (ui->txtTitle->text().trimmed() == "") return; // TODO notification
 

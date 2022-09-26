@@ -1,55 +1,55 @@
-#include "HomePage.h"
-#include "ui_HomePage.h"
+#include "PHomePage.h"
+#include "ui_PHomePage.h"
 
 #include <QSettings>
 #include <QFileDialog>
 #include <QMessageBox>
 
-#include "utils/Theme.h"
+#include "utils/font.h"
 
-using namespace HomePage;
+using namespace pluginHome::utils;
 
 // CONSTRUCTOR ///////////////////////////////////////////////////////////
 
-Plugin::Plugin(QMainWindow* parent) :
+PHomePage::PHomePage(QMainWindow* parent) :
     QWidget(parent),
-    ui(new Ui::HomePage)
+    ui(new Ui::PHomePage)
   , parent(parent)
 {
     ui->setupUi(this);
-    ui->lblTitle->setText(tr("Welcome to") + " <font color='" + Theme::getColor("@active") + "'>" + qApp->applicationName() + "</font>");
+    ui->lblTitle->setText(qApp->applicationName());
     ui->btNewFile->setEnabled(false);
     ui->btOpenFile->setEnabled(false);
 
     ui->leftMenu->layout()->removeWidget(ui->btExit);
 
-    ui_switchSaveProject = new QSwitchButton("Open last project");
-    ui_switchSaveProject->style.font = QFont("Ubuntu", 10);
+    ui_switchSaveProject = new CSwitchButton(tr("Open last project"));
+    ui_switchSaveProject->style.font = smallerFont(ui->btNewProject->font(), 2);
     ui_switchSaveProject->init();
-    connect(ui_switchSaveProject, &QSwitchButton::toggled, this, [=](bool checked)
+    connect(ui_switchSaveProject, &CSwitchButton::toggled, this, [=](bool checked)
     {
         QSettings settings;
         if (checked) {
-            settings.setValue("homepage/saveproject", true);
+            settings.setValue("application/homepage/saveproject", true);
             this->m_openLastProject = true;
         } else {
-            settings.remove("homepage/saveproject");
+            settings.remove("application/homepage/saveproject");
             this->m_openLastProject = false;
         }
     });
     ui->leftMenu->layout()->addWidget(ui_switchSaveProject);
 
-    ui_switchSaveFile = new QSwitchButton("Open last file");
-    ui_switchSaveFile->style.font = QFont("Ubuntu", 10);
+    ui_switchSaveFile = new CSwitchButton(tr("Open last file"));
+    ui_switchSaveFile->style.font = smallerFont(ui->btNewProject->font(), 2);
     ui_switchSaveFile->init();
-    connect(ui_switchSaveFile, &QSwitchButton::toggled, this, [=](bool checked)
+    connect(ui_switchSaveFile, &CSwitchButton::toggled, this, [=](bool checked)
     {
         QSettings settings;
         if (checked) {
-            settings.setValue("homepage/savefile", true);
+            settings.setValue("application/homepage/savefile", true);
             this->m_openLastFile = true;
         } else {
-            settings.remove("homepage/savefile");
+            settings.remove("application/homepage/savefile");
             this->m_openLastFile = false;
         }
     });
@@ -59,9 +59,9 @@ Plugin::Plugin(QMainWindow* parent) :
 
     this->initUi();
 
-    connect(ui->btNewProject, &QPushButton::clicked, this, &Plugin::onNewProject);
-    connect(ui->btNewFile, &QPushButton::clicked, this, &Plugin::onNewFile);
-    connect(ui->btOpenFile, &QPushButton::clicked, this, &Plugin::onOpenFile);
+    connect(ui->btNewProject, &QPushButton::clicked, this, &PHomePage::onNewProject);
+    connect(ui->btNewFile, &QPushButton::clicked, this, &PHomePage::onNewFile);
+    connect(ui->btOpenFile, &QPushButton::clicked, this, &PHomePage::onOpenFile);
     connect(ui->btExit, &QPushButton::clicked, this, [=](){
         parent->close();
     });
@@ -76,16 +76,16 @@ Plugin::Plugin(QMainWindow* parent) :
     this->load();
 }
 
-Plugin::~Plugin()
+PHomePage::~PHomePage()
 {
     delete ui;
 }
 
-void Plugin::load()
+void PHomePage::load()
 {
     QSettings settings;
 
-    settings.beginGroup("homepage/project");
+    settings.beginGroup("application/homepage/project");
     auto keys = settings.allKeys();
     keys.sort();
     for (const QString& code: keys) {
@@ -94,23 +94,23 @@ void Plugin::load()
     settings.endGroup();
 
     this->m_files.clear();
-    settings.beginGroup("homepage/file");
+    settings.beginGroup("application/homepage/file");
     // TODO SORT BY TITLE
     for (const QString& code: settings.allKeys()) {
         this->addFile(settings.value(code).toJsonObject());
     }
     settings.endGroup();
 
-    this->m_openLastProject = settings.contains("homepage/saveproject");
+    this->m_openLastProject = settings.contains("application/homepage/saveproject");
     ui_switchSaveProject->setChecked(this->m_openLastProject);
 
     this->m_openLastFile = settings.contains("homepage/savefile");
     ui_switchSaveFile->setChecked(this->m_openLastFile);
 
-    if (this->m_openLastProject && settings.contains("homepage/currentproject"))
+    if (this->m_openLastProject && settings.contains("application/homepage/currentproject"))
     {
-        const QString& code = settings.value("homepage/currentproject").toString();
-        auto projects = ui->projects->findChildren<ProjectWidget*>();
+        const QString& code = settings.value("application/homepage/currentproject").toString();
+        auto projects = ui->projects->findChildren<PHomePageProjectWidget*>();
         for (auto p: projects) {
             if (p->code() == code) {
                 p->select();
@@ -119,8 +119,8 @@ void Plugin::load()
         }
     }
 
-    if (this->m_openLastFile && settings.contains("homepage/currentfile")) {
-        const QString& id = settings.value("homepage/currentfile").toString();
+    if (this->m_openLastFile && settings.contains("application/homepage/currentfile")) {
+        const QString& id = settings.value("application/homepage/currentfile").toString();
         for (auto file: this->m_files) {
             if (file->id() == id) {
                 this->current_file = file;
@@ -129,14 +129,14 @@ void Plugin::load()
     }
 }
 
-void Plugin::reload()
+void PHomePage::reload()
 {
-    auto projects = ui->projects->findChildren<ProjectWidget*>();
+    auto projects = ui->projects->findChildren<PHomePageProjectWidget*>();
     for (auto project: projects) {
         project->close();
         project->deleteLater();
     }
-    auto files = ui->files->findChildren<FileWidget*>();
+    auto files = ui->files->findChildren<PHomePageFileWidget*>();
     for (auto file: files) {
         file->close();
         file->deleteLater();
@@ -145,12 +145,12 @@ void Plugin::reload()
 
     this->current_project = nullptr;
     QSettings settings;
-    settings.remove("homepage/currentproject");
+    settings.remove("application/homepage/currentproject");
     ui->btNewFile->setEnabled(false);
     ui->btOpenFile->setEnabled(false);
 }
 
-void Plugin::initUi()
+void PHomePage::initUi()
 {
     main = parent->centralWidget();
 
@@ -168,7 +168,7 @@ void Plugin::initUi()
     parent->setCentralWidget(global);
 }
 
-void Plugin::show()
+void PHomePage::show()
 {
     home->setVisible(true);
     main->setVisible(false);
@@ -178,18 +178,18 @@ void Plugin::show()
     }
 }
 
-void Plugin::hide()
+void PHomePage::hide()
 {
     home->setVisible(false);
     main->setVisible(true);
 }
 
-void Plugin::closeCurrentFile()
+void PHomePage::closeCurrentFile()
 {
     this->current_file = nullptr;
     if (this->m_openLastFile) {
         QSettings settings;
-        settings.remove("homepage/currentfile");
+        settings.remove("application/homepage/currentfile");
     }
 
     this->show();
@@ -198,30 +198,30 @@ void Plugin::closeCurrentFile()
 
 // PROJECTS //////////////////////////////////////////////////////////////
 
-void Plugin::addProject(bool hasProject, const QJsonObject& project)
+void PHomePage::addProject(bool hasProject, const QJsonObject& project)
 {
-    ProjectWidget* pi = new ProjectWidget(ui->projects);
+    PHomePageProjectWidget* pi = new PHomePageProjectWidget(ui->projects);
     if (hasProject) pi->setProject(project);
-    connect(pi, &ProjectWidget::created, this, &Plugin::onProjectCreated);
-    connect(pi, &ProjectWidget::selected, this, &Plugin::onProjectSelected);
-    connect(pi, &ProjectWidget::deleted, this, &Plugin::onProjectDeleted);
-    connect(pi, &ProjectWidget::updated, this, &Plugin::onProjectUpdated);
+    connect(pi, &PHomePageProjectWidget::created, this, &PHomePage::onProjectCreated);
+    connect(pi, &PHomePageProjectWidget::selected, this, &PHomePage::onProjectSelected);
+    connect(pi, &PHomePageProjectWidget::deleted, this, &PHomePage::onProjectDeleted);
+    connect(pi, &PHomePageProjectWidget::updated, this, &PHomePage::onProjectUpdated);
     auto layout = static_cast<QVBoxLayout*>(ui->projects->layout());
     layout->addWidget(pi);
 }
 
 
-void Plugin::onNewProject()
+void PHomePage::onNewProject()
 {
     this->addProject();
 }
 
-void Plugin::onProjectCreated(Project* project)
+void PHomePage::onProjectCreated(PHomePageProject* project)
 {
     this->reload();
 
     const QString& code = project->code();
-    auto projects = ui->projects->findChildren<ProjectWidget*>();
+    auto projects = ui->projects->findChildren<PHomePageProjectWidget*>();
     for (auto p: projects) {
         if (p->code() != code) {
             p->unselect();
@@ -232,11 +232,11 @@ void Plugin::onProjectCreated(Project* project)
     }
 }
 
-void Plugin::onProjectSelected(Project* project)
+void PHomePage::onProjectSelected(PHomePageProject* project)
 {
     if (project == nullptr) return;
 
-    auto projects = ui->projects->findChildren<ProjectWidget*>();
+    auto projects = ui->projects->findChildren<PHomePageProjectWidget*>();
     for (auto p: projects) {
         if (p->code() != project->code()) {
             p->unselect();
@@ -245,7 +245,7 @@ void Plugin::onProjectSelected(Project* project)
 
             if (this->m_openLastProject) {
                 QSettings settings;
-                settings.setValue("homepage/currentproject", this->current_project->code());
+                settings.setValue("application/homepage/currentproject", this->current_project->code());
             }
         }
     }
@@ -253,7 +253,7 @@ void Plugin::onProjectSelected(Project* project)
     ui->btNewFile->setEnabled(true);
     ui->btOpenFile->setEnabled(true);
 
-    auto files = ui->files->findChildren<FileWidget*>();
+    auto files = ui->files->findChildren<PHomePageFileWidget*>();
     for (auto file: files) {
         file->close();
         file->deleteLater();
@@ -268,17 +268,17 @@ void Plugin::onProjectSelected(Project* project)
     }
 }
 
-void Plugin::onProjectDeleted(Project* /*project*/)
+void PHomePage::onProjectDeleted(PHomePageProject* /*project*/)
 {
     this->reload();
 }
 
-void Plugin::onProjectUpdated(Project* project)
+void PHomePage::onProjectUpdated(PHomePageProject* project)
 {
     this->reload();
 
     const QString& code = project->code();
-    auto projects = ui->projects->findChildren<ProjectWidget*>();
+    auto projects = ui->projects->findChildren<PHomePageProjectWidget*>();
     for (auto p: projects) {
         if (p->code() != code) {
             p->unselect();
@@ -292,47 +292,47 @@ void Plugin::onProjectUpdated(Project* project)
 
 // FILES /////////////////////////////////////////////////////////////////
 
-void Plugin::addFile(const QJsonObject& file)
+void PHomePage::addFile(const QJsonObject& file)
 {
     const QString& id = file.value("id").toString();
     const QString& code = file.value("projectcode").toString();
     const QString& title = file.value("title").toString();
     const QString& path = file.value("path").toString();
 
-    auto projects = ui->projects->findChildren<ProjectWidget*>();
+    auto projects = ui->projects->findChildren<PHomePageProjectWidget*>();
     for (auto p: projects) {
         if (p->code() == code) {
-            this->m_files.append(new File(id, p->project(), title, path));
+            this->m_files.append(new PHomePageFile(id, p->project(), title, path));
         }
     }
     this->onProjectSelected(this->current_project);
 }
 
-void Plugin::createFile(const QString& title, const QString& path)
+void PHomePage::createFile(const QString& title, const QString& path)
 {
     const QString& id = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
-    File* file = new File(id, this->current_project, title, path);
+    PHomePageFile* file = new PHomePageFile(id, this->current_project, title, path);
 
     QSettings settings;
-    settings.setValue("homepage/file/" + id, file->toJson());
+    settings.setValue("application/homepage/file/" + id, file->toJson());
 
     this->m_files.append(file);
     this->onProjectSelected(this->current_project);
 }
 
-void Plugin::addFileToUi(File* file)
+void PHomePage::addFileToUi(PHomePageFile* file)
 {
-    FileWidget* fw = new FileWidget(ui->files);
+    PHomePageFileWidget* fw = new PHomePageFileWidget(ui->files);
     fw->setFile(file);
-    connect(fw, &FileWidget::deleted, this, &Plugin::onFileDeleted);
-    connect(fw, &FileWidget::updated, this, &Plugin::onFileUpdated);
-    connect(fw, &FileWidget::doubleclicked, this, &Plugin::onFileSelected);
+    connect(fw, &PHomePageFileWidget::deleted, this, &PHomePage::onFileDeleted);
+    connect(fw, &PHomePageFileWidget::updated, this, &PHomePage::onFileUpdated);
+    connect(fw, &PHomePageFileWidget::doubleclicked, this, &PHomePage::onFileSelected);
     auto layout = static_cast<QVBoxLayout*>(ui->files->layout());
     layout->addWidget(fw);
 }
 
-void Plugin::onNewFile()
+void PHomePage::onNewFile()
 {
     QString fileType = this->m_fileTypeName + " (*." + this->m_fileTypeExtension + ")";
 
@@ -355,7 +355,7 @@ void Plugin::onNewFile()
     }
 }
 
-void Plugin::onOpenFile()
+void PHomePage::onOpenFile()
 {
     QString fileType = this->m_fileTypeName + " (*." + this->m_fileTypeExtension + ")";
 
@@ -365,36 +365,36 @@ void Plugin::onOpenFile()
         const QString& id = QUuid::createUuid().toString(QUuid::WithoutBraces);
         const QString& title = QFileInfo(fileName).baseName();
 
-        File* file = new File(id, this->current_project, title, fileName);
+        PHomePageFile* file = new PHomePageFile(id, this->current_project, title, fileName);
 
         QSettings settings;
-        settings.setValue("homepage/file/" + id, file->toJson());
+        settings.setValue("application/homepage/file/" + id, file->toJson());
 
         this->m_files.append(file);
         this->onProjectSelected(this->current_project);
     }
 }
 
-void Plugin::onFileDeleted(File* file)
+void PHomePage::onFileDeleted(PHomePageFile* file)
 {
     // TODO Option to delete file on disk
     this->m_files.removeOne(file);
     QSettings settings;
-    settings.remove("homepage/file/" + file->id());
+    settings.remove("application/homepage/file/" + file->id());
 }
 
-void Plugin::onFileUpdated(File* file)
+void PHomePage::onFileUpdated(PHomePageFile* file)
 {
     QSettings settings;
-    settings.setValue("homepage/file/" + file->id(), file->toJson());
+    settings.setValue("application/homepage/file/" + file->id(), file->toJson());
 }
 
-void Plugin::onFileSelected(File* file)
+void PHomePage::onFileSelected(PHomePageFile* file)
 {
     this->current_file = file;
     if (this->m_openLastFile) {
         QSettings settings;
-        settings.setValue("homepage/currentfile", file->id());
+        settings.setValue("application/homepage/currentfile", file->id());
     }
 
     this->hide();

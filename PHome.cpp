@@ -4,14 +4,17 @@
 #include <QTextStream>
 #include <QTranslator>
 
-void PHome::LoadTranslation(QApplication* app, QLocale locale)
+QTranslator* PHome::Translator()
 {
     Q_INIT_RESOURCE(pluginHome);
 
     QTranslator* appTranslator = new QTranslator();
-    if (appTranslator->load(locale, QLatin1String("pluginHome"), QLatin1String("_"), QLatin1String(":/i18n"))) {
-        app->installTranslator(appTranslator);
+    if (appTranslator->load(QLocale(), QLatin1String("pluginHome"), QLatin1String("_"), QLatin1String(":/i18n"))) {
+        return appTranslator;
+    } else {
+        // TODO Error message
     }
+    return nullptr;
 }
 
 QString PHome::Theme()
