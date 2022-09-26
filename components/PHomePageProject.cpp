@@ -203,19 +203,14 @@ void PHomePageProjectWidget::onCodeChanged(const QString& text)
 
 void PHomePageProjectWidget::select()
 {
-    // TODO replace
-    //ui->show->setStyleSheet("background-color: " + Theme::getColor("@homepageprojetselected"));
+    // TODO set as global option
     ui->show->setStyleSheet("background-color: #EFEFEF");
-    //@homepageprojetselected = #EFEFEF
-    //@homepageprojetunselected = #FAFAFA
-    //ui->show.sets
     emit this->selected(this->m_project);
 }
 
 void PHomePageProjectWidget::unselect()
 {
-    // TODO replace
-    //ui->show->setStyleSheet("background-color: " + Theme::getColor("@homepageprojetunselected"));
+    // TODO set as global option
     ui->show->setStyleSheet("background-color: #FAFAFA");
 }
 
