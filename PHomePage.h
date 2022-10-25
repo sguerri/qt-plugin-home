@@ -14,12 +14,29 @@ namespace Ui {
     class PHomePage;
 }
 
+class PHomePage;
+
+class PCentralWidget: public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit PCentralWidget(QMainWindow* parent, PHomePage* page);
+    ~PCentralWidget();
+
+private:
+    PHomePage* m_page;
+
+protected:
+    void showEvent(QShowEvent* event);
+};
+
 class PHomePage : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit PHomePage(QMainWindow* parent);
+    explicit PHomePage(QMainWindow* parent, std::function<void (PHomePageFile*)> fn);
     ~PHomePage();
 
     void show();
@@ -51,8 +68,8 @@ private:
     CSwitchButton* ui_switchSaveFile;
 
     QMainWindow* parent;
-    QWidget* home;
-    QWidget* main;
+    //QWidget* plugin;
+    //QWidget* main;
 
     void initUi();
     void load();

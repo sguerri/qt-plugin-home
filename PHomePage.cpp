@@ -9,19 +9,58 @@
 
 using namespace pluginHome::utils;
 
+
+
+
+
+PCentralWidget::PCentralWidget(QMainWindow* parent, PHomePage* page) :
+    QWidget(parent)
+  , m_page(page)
+{}
+
+PCentralWidget::~PCentralWidget() {}
+
+void PCentralWidget::showEvent(QShowEvent* event)
+{
+    //qDebug() << "SHOW" << this->m_page->hasCurrentFile();
+    if (!this->m_page->hasCurrentFile()) {
+        event->ignore();
+        this->m_page->show();
+    } else {
+        event->accept();
+    }
+}
+
+
+
+
+
+
+
+
+
+
 // CONSTRUCTOR ///////////////////////////////////////////////////////////
 
-PHomePage::PHomePage(QMainWindow* parent) :
+PHomePage::PHomePage(QMainWindow* parent, std::function<void (PHomePageFile*)> fn) :
     QWidget(parent),
     ui(new Ui::PHomePage)
   , parent(parent)
 {
+    parent->setProperty("hasHomePage", true);
+
+    connect(this, &PHomePage::fileOpened, parent, fn);
+
+    // TODO Use this to display settings page button
+    // qDebug() << parent->property("hasSettingsPage");
+
     ui->setupUi(this);
     ui->lblTitle->setText(qApp->applicationName());
     ui->btNewFile->setEnabled(false);
     ui->btOpenFile->setEnabled(false);
 
     ui->leftMenu->layout()->removeWidget(ui->btExit);
+    ui->leftMenu->layout()->removeWidget(ui->btSettings);
 
     ui_switchSaveProject = new CSwitchButton(tr("Open last project"));
     ui_switchSaveProject->style.font = smallerFont(ui->btNewProject->font(), 2);
@@ -55,6 +94,20 @@ PHomePage::PHomePage(QMainWindow* parent) :
     });
     ui->leftMenu->layout()->addWidget(ui_switchSaveFile);
 
+    if (parent->property("hasSettingsPage").toBool()) {
+        ui->leftMenu->layout()->addWidget(ui->btSettings);
+        connect(ui->btSettings, &QPushButton::clicked, this, [=](){
+            for (auto c: parent->centralWidget()->children()) {
+                if (c->objectName() == "centralwidget") {
+                    static_cast<QWidget*>(c)->setVisible(false);
+                } else if (c->objectName() == "PSettingsPage") {
+                    static_cast<QWidget*>(c)->setVisible(true);
+                } else if (c->objectName().startsWith("P") && c->objectName().endsWith("Page")) {
+                    static_cast<QWidget*>(c)->setVisible(false);
+                }
+            }
+        });
+    }
     ui->leftMenu->layout()->addWidget(ui->btExit);
 
     this->initUi();
@@ -104,7 +157,7 @@ void PHomePage::load()
     this->m_openLastProject = settings.contains("application/homepage/saveproject");
     ui_switchSaveProject->setChecked(this->m_openLastProject);
 
-    this->m_openLastFile = settings.contains("homepage/savefile");
+    this->m_openLastFile = settings.contains("application/homepage/savefile");
     ui_switchSaveFile->setChecked(this->m_openLastFile);
 
     if (this->m_openLastProject && settings.contains("application/homepage/currentproject"))
@@ -124,6 +177,7 @@ void PHomePage::load()
         for (auto file: this->m_files) {
             if (file->id() == id) {
                 this->current_file = file;
+                emit this->fileOpened(file);
             }
         }
     }
@@ -152,26 +206,69 @@ void PHomePage::reload()
 
 void PHomePage::initUi()
 {
-    main = parent->centralWidget();
+    QWidget* main = parent->centralWidget();
+    QWidget* central = main;
+
+    //plugin = this;
+    this->setVisible(false);
+
+    if (main->objectName() == "pluginLayout") {
+        main->layout()->addWidget(this);
+        for (auto c: main->children()) {
+            if (c->objectName() == "centralwidget") {
+                central = static_cast<QWidget*>(c);
+            }
+        }
+
+    } else {
+        QHBoxLayout* layout = new QHBoxLayout();
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->addWidget(this);
+        layout->addWidget(parent->centralWidget());
+
+        QWidget* global = new QWidget();
+        global->setLayout(layout);
+        global->setObjectName("pluginLayout");
+
+        parent->setCentralWidget(global);
+    }
+
+    parent->centralWidget()->layout()->removeWidget(central);
 
     QHBoxLayout* layout = new QHBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(this);
-    layout->addWidget(parent->centralWidget());
+    layout->addWidget(central);
 
-    QWidget* global = new QWidget();
-    global->setLayout(layout);
+    QWidget* newcentral = new PCentralWidget(parent, this);
+    newcentral->setObjectName("centralwidget");
+    newcentral->setLayout(layout);
 
-    home = this;
-    home->setVisible(false);
-
-    parent->setCentralWidget(global);
+    parent->centralWidget()->layout()->addWidget(newcentral);
 }
 
 void PHomePage::show()
 {
-    home->setVisible(true);
-    main->setVisible(false);
+    for (auto c: parent->centralWidget()->children()) {
+        if (c->objectName() == "centralwidget") {
+            static_cast<QWidget*>(c)->setVisible(false);
+        } else if (c->objectName() == "PHomePage") {
+            static_cast<QWidget*>(c)->setVisible(true);
+        } else if (c->objectName().startsWith("P") && c->objectName().endsWith("Page")) {
+            static_cast<QWidget*>(c)->setVisible(false);
+        }
+    }
+
+    /*
+    for (auto c: parent->centralWidget().c ->findChildren<QWidget*>()) {
+        qDebug() << this << c;
+        c->setVisible(false);
+        if (c == this) c->setVisible(true);
+    }
+    */
+    //main
+
+    //plugin->setVisible(true);
+    //main->setVisible(false);
 
     if (this->m_openLastFile && this->current_file != nullptr) {
         this->onFileSelected(this->current_file);
@@ -180,8 +277,15 @@ void PHomePage::show()
 
 void PHomePage::hide()
 {
-    home->setVisible(false);
-    main->setVisible(true);
+    for (auto c: parent->centralWidget()->children()) {
+        if (c->objectName() == "centralwidget") {
+            static_cast<QWidget*>(c)->setVisible(true);
+        } else if (c->objectName().startsWith("P") && c->objectName().endsWith("Page")) {
+            static_cast<QWidget*>(c)->setVisible(false);
+        }
+    }
+    //plugin->setVisible(false);
+    //main->setVisible(true);
 }
 
 void PHomePage::closeCurrentFile()

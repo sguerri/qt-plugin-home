@@ -4,52 +4,66 @@
 <context>
     <name>PHomePage</name>
     <message>
-        <location filename="../PHomePage.ui" line="80"/>
         <source>Welcome to &lt;Application&gt;</source>
-        <translation>Bienvenue à &lt;Application&gt;</translation>
+        <translation type="vanished">Bienvenue à &lt;Application&gt;</translation>
     </message>
     <message>
-        <location filename="../PHomePage.ui" line="137"/>
+        <location filename="../PHomePage.ui" line="186"/>
         <source>New Project</source>
         <translation>Nouveau projet</translation>
     </message>
     <message>
-        <location filename="../PHomePage.ui" line="177"/>
+        <location filename="../PHomePage.ui" line="226"/>
         <source>New File</source>
         <translation>Nouveau fichier</translation>
     </message>
     <message>
-        <location filename="../PHomePage.ui" line="201"/>
+        <location filename="../PHomePage.ui" line="250"/>
         <source>Open File</source>
         <translation>Ouvrir un fichier</translation>
     </message>
     <message>
-        <location filename="../PHomePage.ui" line="238"/>
+        <location filename="../PHomePage.ui" line="287"/>
+        <source>Settings</source>
+        <translation>Paramètres</translation>
+    </message>
+    <message>
+        <location filename="../PHomePage.ui" line="311"/>
         <source>Quit</source>
         <translation>Quitter</translation>
     </message>
     <message>
-        <location filename="../PHomePage.ui" line="293"/>
+        <location filename="../PHomePage.ui" line="366"/>
         <source>Projects</source>
         <translation>Projets</translation>
     </message>
     <message>
-        <location filename="../PHomePage.ui" line="300"/>
+        <location filename="../PHomePage.ui" line="373"/>
         <source>Files</source>
         <translation>Fichiers</translation>
     </message>
     <message>
-        <location filename="../PHomePage.cpp" line="21"/>
+        <location filename="../PHomePage.ui" line="97"/>
         <source>Welcome to</source>
         <translation>Bienvenue à</translation>
     </message>
     <message>
-        <location filename="../PHomePage.cpp" line="73"/>
+        <location filename="../PHomePage.cpp" line="65"/>
+        <source>Open last project</source>
+        <translation>Ouvrir le projet courant</translation>
+    </message>
+    <message>
+        <location filename="../PHomePage.cpp" line="81"/>
+        <source>Open last file</source>
+        <translation>Ouvrir le fichier courant</translation>
+    </message>
+    <message>
+        <location filename="../PHomePage.cpp" line="125"/>
         <source>JSON files</source>
         <translation>Fichiers JSON</translation>
     </message>
     <message>
-        <location filename="../PHomePage.cpp" line="347"/>
+        <location filename="../PHomePage.cpp" line="451"/>
         <source>Error when saving file</source>
         <translation>Erreur en sauvegardant le fichier</translation>
     </message>
@@ -105,17 +119,17 @@
 <context>
     <name>PHomePageProjectWidget</name>
     <message>
-        <location filename="../components/PHomePageProject.cpp" line="122"/>
+        <location filename="../components/PHomePageProject.cpp" line="112"/>
         <source>Create the project</source>
         <translation>Créer le projet</translation>
     </message>
     <message>
-        <location filename="../components/PHomePageProject.cpp" line="122"/>
+        <location filename="../components/PHomePageProject.cpp" line="112"/>
         <source>Save changes</source>
         <translation>Sauvegarder</translation>
     </message>
     <message>
-        <location filename="../components/PHomePageProject.cpp" line="186"/>
+        <location filename="../components/PHomePageProject.cpp" line="176"/>
         <source>Delete project?</source>
         <translation>Supprimer le projet ?</translation>
     </message>
