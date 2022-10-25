@@ -1,0 +1,101 @@
+/********* HOME PAGE ***********************************/
+
+PHomePage * {
+    background-color: @bgMain;
+    border: none;
+}
+
+PHomePage #topBar {
+    background-color: @bgSecond;
+}
+
+PHomePage #lblPreTitle {
+    margin-left: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+PHomePage #lblTitle {
+    color: @active;
+}
+
+PHomePage #leftMenu,
+PHomePage #topMenu,
+PHomePage QLabel {
+    background-color: @bgSecond;
+}
+
+PHomePage QPushButton {
+    border: 1px solid @active;
+}
+
+PHomePage QPushButton:hover {
+    background-color: @bgThird;
+}
+
+PHomePage #btNewProject {
+    border-right: 10px solid @active;
+}
+
+/********* HOME PAGE PROJECT ***************************/
+
+PHomePageProjectWidget * {
+    background-color: @bgSecond;
+}
+
+PHomePageProjectWidget #show:hover {
+    border: 3px solid @active;
+}
+
+PHomePageProjectWidget #btCreate,
+PHomePageProjectWidget #btDelete,
+PHomePageProjectWidget #btCancel,
+PHomePageProjectWidget #btEdit {
+    padding: 3px;
+}
+
+PHomePageProjectWidget #btDelete:hover,
+PHomePageProjectWidget #btCancel:hover,
+PHomePageProjectWidget #btEdit:hover {
+    background-color: @active;
+}
+
+PHomePageProjectWidget #lblTitle {
+    color: @active;
+}
+
+PHomePageProjectWidget QLineEdit {
+    background-color: @editBackground;
+}
+
+/********* HOME PAGE FILE ******************************/
+
+PHomePageFileWidget * {
+    background-color: @bgSecond;
+}
+
+PHomePageFileWidget #lblTitle {
+    color: @active;
+}
+
+PHomePageFileWidget #show:hover {
+    border: 3px solid @active;
+}
+
+PHomePageFileWidget #btUpdate,
+PHomePageFileWidget #btDelete,
+PHomePageFileWidget #btCancel,
+PHomePageFileWidget #btEdit {
+    padding: 3px;
+}
+
+PHomePageFileWidget #btDelete:hover,
+PHomePageFileWidget #btCancel:hover,
+PHomePageFileWidget #btEdit:hover {
+    background-color: @active;
+}
+
+PHomePageFileWidget QLineEdit {
+    background-color: @editBackground;
+}
+
